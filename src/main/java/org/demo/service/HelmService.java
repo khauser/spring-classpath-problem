@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class HelmService
 {
-    public static final String HELM_CHART_VERSION_SCRIPT = "scripts/helm_version_script";
+    public static final String HELM_CHART_VERSION_SCRIPT = "classpath:scripts/helm_version_script";
 
     @Autowired
     private CommandExecutor commandExecutor;
