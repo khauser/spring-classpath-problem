@@ -1,0 +1,97 @@
+plugins {
+    // spring boot plugin
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
+
+    // language configuration
+    id 'java'
+
+    // ide configuration
+    id 'eclipse'
+    id 'idea'
+}
+
+// disable ...plain.jar
+jar {
+    enabled = false
+}
+
+// release configuration
+group 'org.demo'
+description 'Java Classpath Problem'
+
+sourceCompatibility = 17
+targetCompatibility = 17
+
+// set correct project status
+if (project.version.endsWith('-SNAPSHOT')) {
+    status = 'snapshot'
+}
+
+repositories {
+    mavenCentral()
+}
+ext {
+    gsonVersion = '2.10.1'
+    jsonVersion = '20230618'
+
+    jUnit5Version = '5.9.3'
+
+    kubernetesClientVersion = '6.8.1'
+
+    logstashLogbackEncoderVersion = '7.2'
+
+    springCloudVersion = '2022.0.3'
+
+    serverPort = 8080
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom "io.fabric8:kubernetes-client-bom:${kubernetesClientVersion}"
+    }
+}
+
+dependencies {
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-freemarker'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+
+    annotationProcessor("org.projectlombok:lombok")
+    compileOnly("org.projectlombok:lombok")
+
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
+
+    // k8s
+    implementation group: 'io.fabric8', name: 'kubernetes-client', version: "${kubernetesClientVersion}"
+
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: "${logstashLogbackEncoderVersion}"
+
+    implementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
+    implementation group: 'org.json', name: 'json', version: "${jsonVersion}"
+
+    testImplementation(platform("org.junit:junit-bom:${jUnit5Version}"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher") {
+        because("Only needed to run tests in a version of IntelliJ IDEA that bundles older versions")
+    }
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+}
+
+apply from: 'gradle/ide.gradle'
+
+bootRun {
+    jvmArgs = [
+        "-Dspring.cloud.bootstrap.enabled=false",
+        "-Dserver.port=7170"
+    ]
+}
+
+gradle.buildFinished {
+    Date now = new Date()
+    println "\n ***** All completed @ $now  ***"
+}

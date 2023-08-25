@@ -1,0 +1,65 @@
+kubernetes:
+  working-dir: /tmp/data/k8s/
+
+###########
+# THREADS #
+###########
+threads:
+  number-rest-threads: 2
+  shutdown-timeout-millis: 180000 # 3min
+
+################
+# FEIGN and CB #
+################
+feign:
+  hystrix:
+    enabled: false
+  client:
+    config:
+      default:
+        connect-timeout: 3000
+        read-timeout: 5000
+        logger-level: full
+
+############
+# LANGUAGE #
+############
+spring:
+  application:
+    name: iste-kubernetes
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+  mvc:
+    locale: en_US
+    locale-resolver: fixed
+##############
+# FREEMARKER #
+##############
+  freemarker:
+    template-loader-path: classpath:/templates/
+    suffix: .ftl
+    charset: UTF-8
+    content-type: text/html
+#############
+# ACTURATOR #
+#############
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  info:
+    git:
+      mode: full
+
+###########
+# LOGGING #
+###########
+logging:
+  level:
+    root: INFO
